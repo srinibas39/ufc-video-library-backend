@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors")
 const app = express();
+const videos = require("./db/videos")
 
 // connect To DB
 const connectToDB = require("./db/connectToDB");
@@ -16,7 +17,9 @@ app.get("/", (req, res) => {
 })
 
 app.get("/videos", (req, res) => {
-    res.json({})
+    res.status(200).json({
+        data:{videos}
+    })
 })
 
 app.listen(3000, () => {
