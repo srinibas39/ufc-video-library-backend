@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 function connectToDB() {
-    mongoose.connect("mongodb+srv://srinibas:1234@cluster0.i5dmocy.mongodb.net/test", {
+    mongoose.connect("mongodb+srv://srinibas:1234@cluster0.i5dmocy.mongodb.net/video-library", {
         useUnifiedTopology: true,
         useNewUrlParser: true,
     })

@@ -17,6 +17,6 @@ const videoSchema = new Schema({
 })
 
 // create model
-const Video=mongoose.model("Video",videoSchema);
+const videoModel=mongoose.model("Video",videoSchema);
 
-module.exports=Video
+module.exports=VideoModel
