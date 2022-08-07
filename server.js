@@ -16,11 +16,29 @@ app.get("/", (req, res) => {
     res.json("Hello Express App")
 })
 
-app.get("/videos", (req, res) => {
+// Get all videos
+
+app.get("/api/videos", (req, res) => {
     res.status(200).json({
-        data:{videos}
+        data: { videos }
     })
 })
+
+// Get single video
+
+app.get("/api/video/:videoId", (req, res) => {
+    const { videoId } = req.params;
+    const video = videos.find((el) => el._id === videoId)
+ 
+    if(video){
+        res.status(200).json({data:{video}})
+    }
+    else{
+        res.json({message:"no video found"})
+    }
+   
+})
+
 
 app.listen(3000, () => {
     console.log("server started")
