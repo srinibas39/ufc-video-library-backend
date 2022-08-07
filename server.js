@@ -15,6 +15,10 @@ app.get("/", (req, res) => {
     res.json("Hello Express App")
 })
 
+app.get("/videos", (req, res) => {
+    res.json({})
+})
+
 app.listen(3000, () => {
     console.log("server started")
 })

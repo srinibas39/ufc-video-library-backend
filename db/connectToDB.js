@@ -9,4 +9,4 @@ function connectToDB() {
         .catch((error) => console.error(error))
 }
 
-module.exports=connectToDB;
+module.exports = connectToDB;
