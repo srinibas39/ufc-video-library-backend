@@ -25,14 +25,33 @@ app.get("/", (req, res) => {
 // signup
 app.post("/api/auth/signup", (req, res) => {
     const { email, password, firstName, lastName } = req.body;
-    if (email && password && firstName, lastName) {
-        const encodedToken = jwt.sign({ id: uuidv4()}, secret);
+    if (email && password && firstName && lastName) {
+        const encodedToken = jwt.sign({ id: uuidv4() }, secret);
         const newUser = new userModel({ _id: uuidv4(), email, password, firstName, lastName, createdAt: formatDate(), updatedAt: formatDate() })
         newUser.save()
-        .then((createdUser)=>res.json({data:{createdUser,encodedToken},status:200}))
-        .catch((error)=>console.error(error))
+            .then((createdUser) => res.json({ data: { createdUser, encodedToken }, status: 200 }))
+            .catch((error) => res.json({ ErrorMessage: error }))
     }
 
+})
+
+// login
+app.post("/api/auth/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    if (email && password) {
+        try{
+
+            const encodedToken = jwt.sign({ id: uuidv4() }, secret);
+            const foundUser = await userModel.findOne({ email })
+            res.json({ data: { foundUser, encodedToken }, status: 200 })
+        }
+        catch(error){
+            res.json({ ErrorMessage: error })
+        }
+
+
+    }
 })
 
 // Get all videos
