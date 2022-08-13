@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 // create Schema
-const videoSchema = new Schema({
+const historySchema = new Schema({
     _id: String,
     title: String,
     video: String,
@@ -11,11 +11,12 @@ const videoSchema = new Schema({
     playlist: Array,
     description: String,
     comments: Array,
-    category: String
-    
+    category: String,
+    userId:String
+
 })
 
-// create model
-const videoModel=mongoose.model("Video",videoSchema);
+// create Model
+const historyModel = mongoose.model("History", historySchema);
 
-module.exports=videoModel;
+module.exports = historyModel;

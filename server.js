@@ -7,9 +7,13 @@ const videos = require("./db/videos");
 const userModel = require("./model/user.model")
 const formatDate = () => dayjs().format("YYYY-MM-DDTHH:mm:ssZ");
 const jwt = require('jsonwebtoken');
+const authVerify = require('./middleware/verifyAuth');
+const historyModel = require("./model/history.model");
+
 
 // connect To DB
 const connectToDB = require("./db/connectToDB");
+
 connectToDB();
 
 app.use(express.json());
@@ -40,13 +44,19 @@ app.post("/api/auth/login", async (req, res) => {
     const { email, password } = req.body;
 
     if (email && password) {
-        try{
+        try {
 
             const encodedToken = jwt.sign({ id: uuidv4() }, secret);
             const foundUser = await userModel.findOne({ email })
-            res.json({ data: { foundUser, encodedToken }, status: 200 })
+            if (password === foundUser.password) {
+
+                res.json({ data: { foundUser, encodedToken }, status: 200 })
+            }
+            else {
+                res.json({ message: "Please check your password" })
+            }
         }
-        catch(error){
+        catch (error) {
             res.json({ ErrorMessage: error })
         }
 
@@ -64,7 +74,7 @@ app.get("/api/videos", (req, res) => {
 
 // Get single video
 
-app.get("/api/video/:videoId", (req, res) => {
+app.get("/api/video/:videoId", authVerify, (req, res) => {
     const { videoId } = req.params;
     const video = videos.find((el) => el._id === videoId)
 
@@ -75,6 +85,47 @@ app.get("/api/video/:videoId", (req, res) => {
         res.json({ message: "no video found" })
     }
 
+})
+
+// add history
+app.post("/api/user/history/:userId", async (req, res) => {
+    const videoItem = req.body;
+    const { userId } = req.params;
+    const newHistory = new historyModel({ ...videoItem, userId })
+
+    newHistory.save()
+        .then(async (savedItem) => {
+
+            const history = await historyModel.find({ userId: userId })
+            res.json({ data: { history: history.slice(0).reverse() } })
+        })
+        .catch(async (error) => {
+            const historyDelete = await historyModel.findOneAndDelete({ _id: videoItem._id })
+            newHistory.save()
+                .then(async (savedItem) => {
+
+                    const history = await historyModel.find({ userId: userId })
+                    res.json({ data: { history: history.slice(0).reverse() } })
+                })
+
+
+
+        })
+
+
+})
+
+// remove history
+app.delete("/api/user/history/:userId/:videoId", async (req, res) => {
+    const { userId, videoId } = req.params;
+    try {
+        const videoItem = await historyModel.findOneAndDelete({ userId: userId, _id: videoId })
+        console.log(videoItem);
+        res.json(videoItem);
+    }
+    catch (error) {
+
+    }
 })
 
 
