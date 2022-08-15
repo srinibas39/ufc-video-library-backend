@@ -13,6 +13,7 @@ const historyModel = require("./model/history.model");
 
 // connect To DB
 const connectToDB = require("./db/connectToDB");
+const likesModel = require('./model/likes.model');
 
 connectToDB();
 
@@ -147,6 +148,36 @@ app.delete("/api/user/history/:userId", async (req, res) => {
     }
     catch (error) {
         res.json({ message: error })
+    }
+})
+
+// add likes
+app.post("/api/user/likes/:userId", async (req, res) => {
+    const videoItem = req.body;
+    const { userId } = req.params;
+    const newLikes = new likesModel({ ...videoItem, userId })
+
+    newLikes.save()
+        .then(async (savedItem) => {
+            const likes = await likesModel.find({ userId: userId })
+            res.json({ data: { likes: likes.slice(0).reverse() } })
+        })
+        .catch(async (error) => {
+            res.json({ message: error })
+
+        })
+})
+
+// remove likes
+app.delete("/api/user/likes/:userId/:videoId", async (req, res) => {
+    const { userId, videoId } = req.params;
+    try {
+        const likeItem = await likesModel.findOneAndDelete({ userId: userId, _id: videoId })
+        const likes=await likesModel.find({userId})
+        res.json({ data: { likes: likes.slice(0).reverse()}})
+    }
+    catch (error) {
+        res.json({message:error})
     }
 })
 
