@@ -21,7 +21,6 @@ app.use(cors())
 app.use(express.urlencoded({ extended: true }))
 const secret = "SRINIBAS"
 
-
 app.get("/", (req, res) => {
     res.json("Hello Express App")
 })
@@ -65,7 +64,6 @@ app.post("/api/auth/login", async (req, res) => {
 })
 
 // Get all videos
-
 app.get("/api/videos", (req, res) => {
     res.status(200).json({
         data: { videos }
@@ -73,7 +71,6 @@ app.get("/api/videos", (req, res) => {
 })
 
 // Get single video
-
 app.get("/api/video/:videoId", authVerify, (req, res) => {
     const { videoId } = req.params;
     const video = videos.find((el) => el._id === videoId)
@@ -128,6 +125,30 @@ app.delete("/api/user/history/:userId/:videoId", async (req, res) => {
     }
 })
 
+// get all history
+app.get("/api/user/history/:userId", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const history = await historyModel.find({ userId: userId })
+        res.json({ data: { history: history.slice(0).reverse() } })
+    }
+    catch (error) {
+        res.json({ message: error })
+    }
+
+})
+
+// remove all history
+app.delete("/api/user/history/:userId", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const history = await historyModel.deleteMany({ userId: userId })
+        res.json({ data: { history: [] } })
+    }
+    catch (error) {
+        res.json({ message: error })
+    }
+})
 
 app.listen(3000, () => {
     console.log("server started")
