@@ -95,7 +95,6 @@ app.post("/api/user/history/:userId", async (req, res) => {
 
     newHistory.save()
         .then(async (savedItem) => {
-
             const history = await historyModel.find({ userId: userId })
             res.json({ data: { history: history.slice(0).reverse() } })
         })
@@ -120,11 +119,12 @@ app.delete("/api/user/history/:userId/:videoId", async (req, res) => {
     const { userId, videoId } = req.params;
     try {
         const videoItem = await historyModel.findOneAndDelete({ userId: userId, _id: videoId })
-        console.log(videoItem);
-        res.json(videoItem);
+        const history = await historyModel.find({ userId: userId })
+        res.json({ data: { history: history.slice(0).reverse() } })
     }
     catch (error) {
-
+        const history = await historyModel.find({ userId: userId })
+        res.json({ data: { history: history.slice(0).reverse() } })
     }
 })
 
