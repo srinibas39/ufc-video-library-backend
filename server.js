@@ -9,11 +9,13 @@ const formatDate = () => dayjs().format("YYYY-MM-DDTHH:mm:ssZ");
 const jwt = require('jsonwebtoken');
 const authVerify = require('./middleware/verifyAuth');
 const historyModel = require("./model/history.model");
+const likesModel = require('./model/likes.model');
+const watchlaterModel = require('./model/watchlater.model');
 
 
 // connect To DB
 const connectToDB = require("./db/connectToDB");
-const likesModel = require('./model/likes.model');
+
 
 connectToDB();
 
@@ -195,10 +197,64 @@ app.get("/api/user/likes/:userId", async (req, res) => {
 
 // remove all likes
 app.delete("/api/user/likes/:userId", async (req, res) => {
-    const { userId, videoId } = req.params;
+    const { userId } = req.params;
     try {
         const deletedLikes = await likesModel.deleteMany({ userId });
         res.json({ data: { likes: [] } });
+    }
+    catch (error) {
+        res.json({ message: error })
+    }
+})
+// -------------------------'
+// add watchlater
+app.post("/api/user/watchlater/:userId", async (req, res) => {
+    const videoItem = req.body;
+    const { userId } = req.params;
+    const newWatchlater = new watchlaterModel({ ...videoItem, userId })
+
+    newWatchlater.save()
+        .then(async (savedItem) => {
+            const watchlater = await watchlaterModel.find({ userId: userId })
+            res.json({ data: { watchlater: watchlater.slice(0).reverse() } })
+        })
+        .catch(async (error) => {
+            res.json({ message: error })
+        })
+})
+
+// remove watchlater
+app.delete("/api/user/watchlater/:userId/:videoId", async (req, res) => {
+    const { userId, videoId } = req.params;
+    try {
+        const likeItem = await watchlaterModel.findOneAndDelete({ userId: userId, _id: videoId })
+        const likes = await watchlaterModel.find({ userId })
+        res.json({ data: { likes: likes.slice(0).reverse() } })
+    }
+    catch (error) {
+        res.json({ message: error })
+    }
+})
+
+// get all watchlater
+app.get("/api/user/watchlater/:userId", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const watchlater = await watchlaterModel.find({ userId });
+        res.json({ data: { watchlater: watchlater.slice(0).reverse() } });
+    }
+    catch (err) {
+        res.json({ message: err });
+    }
+
+})
+
+// remove all watchlater
+app.delete("/api/user/watchlater/:userId", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const deletedWatchlater = await watchlaterModel.deleteMany({ userId });
+        res.json({ data: { watchlater: [] } });
     }
     catch (error) {
         res.json({ message: error })
