@@ -164,7 +164,6 @@ app.post("/api/user/likes/:userId", async (req, res) => {
         })
         .catch(async (error) => {
             res.json({ message: error })
-
         })
 })
 
@@ -173,11 +172,36 @@ app.delete("/api/user/likes/:userId/:videoId", async (req, res) => {
     const { userId, videoId } = req.params;
     try {
         const likeItem = await likesModel.findOneAndDelete({ userId: userId, _id: videoId })
-        const likes=await likesModel.find({userId})
-        res.json({ data: { likes: likes.slice(0).reverse()}})
+        const likes = await likesModel.find({ userId })
+        res.json({ data: { likes: likes.slice(0).reverse() } })
     }
     catch (error) {
-        res.json({message:error})
+        res.json({ message: error })
+    }
+})
+
+// get all likes
+app.get("/api/user/likes/:userId", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const likes = await likesModel.find({ userId });
+        res.json({ data: { likes: likes.slice(0).reverse() } });
+    }
+    catch (err) {
+        res.json({ message: err });
+    }
+
+})
+
+// remove all likes
+app.delete("/api/user/likes/:userId", async (req, res) => {
+    const { userId, videoId } = req.params;
+    try {
+        const deletedLikes = await likesModel.deleteMany({ userId });
+        res.json({ data: { likes: [] } });
+    }
+    catch (error) {
+        res.json({ message: error })
     }
 })
 
