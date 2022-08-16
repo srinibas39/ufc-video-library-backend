@@ -12,10 +12,10 @@ const videoSchema = new Schema({
     description: String,
     comments: Array,
     category: String
-    
+
 })
 
 // create model
-const videoModel=mongoose.model("Video",videoSchema);
+const videoModel = mongoose.model("Video", videoSchema);
 
-module.exports=videoModel;
+module.exports = videoModel;

@@ -15,6 +15,7 @@ const watchlaterModel = require('./model/watchlater.model');
 
 // connect To DB
 const connectToDB = require("./db/connectToDB");
+const playlistsModel = require('./model/playlists.model');
 
 
 connectToDB();
@@ -206,7 +207,7 @@ app.delete("/api/user/likes/:userId", async (req, res) => {
         res.json({ message: error })
     }
 })
-// -------------------------'
+
 // add watchlater
 app.post("/api/user/watchlater/:userId", async (req, res) => {
     const videoItem = req.body;
@@ -259,6 +260,43 @@ app.delete("/api/user/watchlater/:userId", async (req, res) => {
     catch (error) {
         res.json({ message: error })
     }
+})
+
+// add a playlist
+app.post("/api/user/playlists/:userId", async (req, res) => {
+    const playlist = req.body;
+    const { userId } = req.params;
+    const newPlaylist = new playlistsModel({ ...playlist, _id: uuidv4(), userId })
+    newPlaylist.save()
+        .then(async (savedPlaylist) => {
+            const playlists = await playlistsModel.find({ userId })
+            res.json({ data: { playlists: playlists.slice(0).reverse() } })
+        })
+        .catch((error) => {
+            res.json({
+                message: error
+            })
+        })
+
+})
+//  add videos to playlist
+app.post("/api/user/playlists/:playlistId/:userId", async (req, res) => {
+    const video = req.body;
+    const { playlistId, userId } = req.params;
+    try {
+        const playlist = await playlistsModel.findOne({ playlistId });
+        const updatePlaylist = await playlistsModel.updateOne({ videos: [...playlist.videos, video] })
+        // const updatePlaylist=await playlistsModel.updateOne({videos:[]})
+        const playlists = await playlistsModel.find({ userId })
+        res.json({ data: { playlists: playlists.slice(0).reverse() } })
+
+
+    }
+    catch (error) {
+        res.json({ message: error })
+    }
+
+
 })
 
 app.listen(3000, () => {
