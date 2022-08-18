@@ -287,7 +287,7 @@ app.post("/api/user/playlists/:playlistId/:userId", async (req, res) => {
         const playlist = await playlistsModel.findOne({ _id: playlistId });
         const updatePlaylist = await playlistsModel.updateOne({ _id: playlistId }, { videos: [...playlist.videos, video] })
         // const updatePlaylist=await playlistsModel.updateOne({videos:[]})
-        const playlists = await playlistsModel.find({ userId })
+        const playlists = await playlistsModel.find({ userId: userId })
         res.json({ data: { playlists: playlists.slice(0).reverse() } })
 
 
@@ -318,6 +318,30 @@ app.delete("/api/user/playlists/:playlistId", async (req, res) => {
     }
 
 })
+
+app.delete("/api/user/playlists/:playlistId/:videoId", async (req, res) => {
+    const { playlistId, videoId } = req.params;
+    try {
+        const playlist = await playlistsModel.findOne({ _id: playlistId });
+        if (playlist.videos.length) {
+            const videos = playlist.videos.filter((vid) => vid._id !== videoId);
+            const updatedPlaylist = await playlistsModel.findOneAndUpdate({ _id: playlistId }, { videos })
+        }
+        const playlists = await playlistsModel.find({ userId: playlist.userId })
+        if (playlists.length) {
+
+            res.json({ data: { playlists: playlists.slice(0).reverse() } })
+        }
+        else {
+            res.json({ data: { playlists: [] } })
+        }
+
+    }
+    catch (error) {
+        res.json({ message: error })
+    }
+})
+
 
 app.listen(3000, () => {
     console.log("server started")
