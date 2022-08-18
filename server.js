@@ -299,6 +299,7 @@ app.post("/api/user/playlists/:playlistId/:userId", async (req, res) => {
 
 })
 
+// remove a playlist
 app.delete("/api/user/playlists/:playlistId", async (req, res) => {
     const { playlistId } = req.params;
     try {
@@ -319,6 +320,7 @@ app.delete("/api/user/playlists/:playlistId", async (req, res) => {
 
 })
 
+// remove videos from playlist
 app.delete("/api/user/playlists/:playlistId/:videoId", async (req, res) => {
     const { playlistId, videoId } = req.params;
     try {
@@ -336,6 +338,18 @@ app.delete("/api/user/playlists/:playlistId/:videoId", async (req, res) => {
             res.json({ data: { playlists: [] } })
         }
 
+    }
+    catch (error) {
+        res.json({ message: error })
+    }
+})
+
+// get all playlist
+app.get("/api/user/playlists/:userId", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const playlists = await playlistsModel.find({ userId })
+        res.json({ data: { playlists: playlists.slice(0).reverse() } })
     }
     catch (error) {
         res.json({ message: error })
