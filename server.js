@@ -1,18 +1,9 @@
-const { v4: uuidv4 } = require('uuid');
+
 const express = require("express");
 const cors = require("cors")
-const dayjs = require('dayjs')
 const app = express();
-const videos = require("./db/videos");
-const userModel = require("./model/user.model")
-const formatDate = () => dayjs().format("YYYY-MM-DDTHH:mm:ssZ");
-const jwt = require('jsonwebtoken');
-const authVerify = require('./middleware/verifyAuth');
-const historyModel = require("./model/history.model");
-const likesModel = require('./model/likes.model');
-const watchlaterModel = require('./model/watchlater.model');
-const playlistsModel = require('./model/playlists.model');
-const { getAllPlaylist } = require('./controller/playlists.controller');
+
+
 
 // connect To DB
 const connectToDB = require("./db/connectToDB");
@@ -45,6 +36,8 @@ app.use("/api/user/playlists", playlistRouter);
 
 connectToDB();
 
-app.listen(3000, () => {
+const port = process.env.PORT || 3000
+
+app.listen(port, () => {
     console.log("server started")
 })
